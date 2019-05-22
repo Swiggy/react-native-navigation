@@ -4,17 +4,21 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 
 import com.reactnativenavigation.BaseTest;
 import com.reactnativenavigation.mocks.SimpleComponentViewController;
-import com.reactnativenavigation.parse.*;
+import com.reactnativenavigation.parse.Options;
+import com.reactnativenavigation.parse.SideMenuOptions;
 import com.reactnativenavigation.parse.params.Bool;
 import com.reactnativenavigation.parse.params.Number;
 import com.reactnativenavigation.parse.params.Text;
 import com.reactnativenavigation.presentation.Presenter;
 import com.reactnativenavigation.presentation.SideMenuPresenter;
-import com.reactnativenavigation.utils.*;
+import com.reactnativenavigation.utils.CommandListenerAdapter;
+import com.reactnativenavigation.utils.Functions;
 import com.reactnativenavigation.viewcontrollers.ChildControllersRegistry;
 import com.reactnativenavigation.viewcontrollers.ParentController;
 import com.reactnativenavigation.viewcontrollers.ViewController;
@@ -30,6 +34,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("MagicNumber")
 public class SideMenuControllerTest extends BaseTest {
@@ -37,8 +42,8 @@ public class SideMenuControllerTest extends BaseTest {
     private Activity activity;
     private ChildControllersRegistry childRegistry;
     private SideMenuPresenter presenter;
-    private ViewController left;
-    private ViewController right;
+    private ViewController left; private boolean isLeftShown;
+    private ViewController right; private boolean isRightShown;
     private ViewController center;
     private ViewController child;
     private ParentController parent;
@@ -46,12 +51,23 @@ public class SideMenuControllerTest extends BaseTest {
 
     @Override
     public void beforeEach() {
-        activity = newActivity();
+        activity = createActivity();
+
         childRegistry = new ChildControllersRegistry();
         presenter = spy(new SideMenuPresenter());
         child = new SimpleComponentViewController(activity, childRegistry, "child", new Options());
-        left = new SimpleComponentViewController(activity, childRegistry, "left", new Options());
-        right = new SimpleComponentViewController(activity, childRegistry, "right", new Options());
+        left = new SimpleComponentViewController(activity, childRegistry, "left", new Options()) {
+            @Override
+            public boolean isViewShown() {
+                return isLeftShown;
+            }
+        };
+        right = new SimpleComponentViewController(activity, childRegistry, "right", new Options()) {
+            @Override
+            public boolean isViewShown() {
+                return isRightShown;
+            }
+        };
         center = spy(new SimpleComponentViewController(activity, childRegistry, "center", new Options()));
         uut = new SideMenuController(activity, childRegistry, "sideMenu", new Options(), presenter, new Presenter(activity, new Options())) {
             @Override
@@ -223,10 +239,12 @@ public class SideMenuControllerTest extends BaseTest {
         verify(spy, times(0)).onViewAppeared();
 
         openLeftMenu();
+        dispatchOnGlobalLayout(spy.getView());
         assertThat(uut.getView().isDrawerOpen(Gravity.LEFT)).isTrue();
         verify(spy).onViewAppeared();
 
         closeLeft();
+        dispatchOnGlobalLayout(spy.getView());
         assertThat(uut.getView().isDrawerOpen(Gravity.LEFT)).isFalse();
         verify(spy).onViewDisappear();
     }
@@ -241,10 +259,12 @@ public class SideMenuControllerTest extends BaseTest {
         verify(spy, times(0)).onViewAppeared();
 
         openRightMenu();
+        dispatchOnGlobalLayout(spy.getView());
         assertThat(uut.getView().isDrawerOpen(Gravity.RIGHT)).isTrue();
         verify(spy).onViewAppeared();
 
         closeRightMenu();
+        dispatchOnGlobalLayout(spy.getView());
         assertThat(uut.getView().isDrawerOpen(Gravity.RIGHT)).isFalse();
         verify(spy).onViewDisappear();
     }
@@ -279,6 +299,7 @@ public class SideMenuControllerTest extends BaseTest {
     }
 
     private void openLeftMenu() {
+        isLeftShown = true;
         Options options = new Options();
         options.sideMenuRootOptions.left.visible = new Bool(true);
         options.sideMenuRootOptions.left.animate = new Bool(false);
@@ -286,6 +307,7 @@ public class SideMenuControllerTest extends BaseTest {
     }
 
     private void openRightMenu() {
+        isRightShown = true;
         Options options = new Options();
         options.sideMenuRootOptions.right.visible = new Bool(true);
         options.sideMenuRootOptions.right.animate = new Bool(false);
@@ -293,6 +315,7 @@ public class SideMenuControllerTest extends BaseTest {
     }
 
     private void closeLeft() {
+        isLeftShown = false;
         Options options = new Options();
         options.sideMenuRootOptions.left.visible = new Bool(false);
         options.sideMenuRootOptions.left.animate = new Bool(false);
@@ -300,9 +323,18 @@ public class SideMenuControllerTest extends BaseTest {
     }
 
     private void closeRightMenu() {
+        isRightShown = false;
         Options options = new Options();
         options.sideMenuRootOptions.right.visible = new Bool(false);
         options.sideMenuRootOptions.right.animate = new Bool(false);
         uut.mergeOptions(options);
+    }
+
+    private Activity createActivity() {
+        Activity activity = spy(newActivity());
+        Window window = Mockito.mock(Window.class);
+        when(window.getDecorView()).thenReturn(Mockito.mock(View.class));
+        when(activity.getWindow()).thenReturn(window);
+        return activity;
     }
 }

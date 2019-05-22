@@ -111,14 +111,12 @@ public class SideMenuController extends ParentController<DrawerLayout> implement
     public void onDrawerOpened(@NonNull View drawerView) {
         ViewController view = this.getMatchingView(drawerView);
         view.mergeOptions(this.getOptionsWithVisibility(this.viewIsLeft(drawerView), true));
-        view.onViewAppeared();
     }
 
     @Override
     public void onDrawerClosed(@NonNull View drawerView) {
         ViewController view = this.getMatchingView(drawerView);
         view.mergeOptions(this.getOptionsWithVisibility(this.viewIsLeft(drawerView), false));
-        view.onViewDisappear();
     }
 
     @Override
@@ -144,15 +142,15 @@ public class SideMenuController extends ParentController<DrawerLayout> implement
 
     public void setLeftController(ViewController controller) {
         this.left = controller;
-        int height = this.getHeight(options.sideMenuRootOptions.left);
-        int width = this.getWidth(options.sideMenuRootOptions.left);
+        int height = getHeight(options.sideMenuRootOptions.left);
+        int width = getWidth(options.sideMenuRootOptions.left);
         getView().addView(controller.getView(), new LayoutParams(width, height, Gravity.LEFT));
     }
 
     public void setRightController(ViewController controller) {
         this.right = controller;
-        int height = this.getHeight(options.sideMenuRootOptions.right);
-        int width = this.getWidth(options.sideMenuRootOptions.right);
+        int height = getHeight(options.sideMenuRootOptions.right);
+        int width = getWidth(options.sideMenuRootOptions.right);
         getView().addView(controller.getView(), new LayoutParams(width, height, Gravity.RIGHT));
     }
 
