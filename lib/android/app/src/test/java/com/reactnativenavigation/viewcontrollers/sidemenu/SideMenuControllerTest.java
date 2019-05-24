@@ -42,8 +42,8 @@ public class SideMenuControllerTest extends BaseTest {
     private Activity activity;
     private ChildControllersRegistry childRegistry;
     private SideMenuPresenter presenter;
-    private ViewController left; private boolean isLeftShown;
-    private ViewController right; private boolean isRightShown;
+    private ViewController left;
+    private ViewController right;
     private ViewController center;
     private ViewController child;
     private ParentController parent;
@@ -56,18 +56,8 @@ public class SideMenuControllerTest extends BaseTest {
         childRegistry = new ChildControllersRegistry();
         presenter = spy(new SideMenuPresenter());
         child = new SimpleComponentViewController(activity, childRegistry, "child", new Options());
-        left = new SimpleComponentViewController(activity, childRegistry, "left", new Options()) {
-            @Override
-            public boolean isViewShown() {
-                return isLeftShown;
-            }
-        };
-        right = new SimpleComponentViewController(activity, childRegistry, "right", new Options()) {
-            @Override
-            public boolean isViewShown() {
-                return isRightShown;
-            }
-        };
+        left = new SimpleComponentViewController(activity, childRegistry, "left", new Options());
+        right = new SimpleComponentViewController(activity, childRegistry, "right", new Options());
         center = spy(new SimpleComponentViewController(activity, childRegistry, "center", new Options()));
         uut = new SideMenuController(activity, childRegistry, "sideMenu", new Options(), presenter, new Presenter(activity, new Options())) {
             @Override
@@ -239,12 +229,10 @@ public class SideMenuControllerTest extends BaseTest {
         verify(spy, times(0)).onViewAppeared();
 
         openLeftMenu();
-        dispatchOnGlobalLayout(spy.getView());
         assertThat(uut.getView().isDrawerOpen(Gravity.LEFT)).isTrue();
         verify(spy).onViewAppeared();
 
         closeLeft();
-        dispatchOnGlobalLayout(spy.getView());
         assertThat(uut.getView().isDrawerOpen(Gravity.LEFT)).isFalse();
         verify(spy).onViewDisappear();
     }
@@ -259,12 +247,10 @@ public class SideMenuControllerTest extends BaseTest {
         verify(spy, times(0)).onViewAppeared();
 
         openRightMenu();
-        dispatchOnGlobalLayout(spy.getView());
         assertThat(uut.getView().isDrawerOpen(Gravity.RIGHT)).isTrue();
         verify(spy).onViewAppeared();
 
         closeRightMenu();
-        dispatchOnGlobalLayout(spy.getView());
         assertThat(uut.getView().isDrawerOpen(Gravity.RIGHT)).isFalse();
         verify(spy).onViewDisappear();
     }
@@ -299,7 +285,6 @@ public class SideMenuControllerTest extends BaseTest {
     }
 
     private void openLeftMenu() {
-        isLeftShown = true;
         Options options = new Options();
         options.sideMenuRootOptions.left.visible = new Bool(true);
         options.sideMenuRootOptions.left.animate = new Bool(false);
@@ -307,7 +292,6 @@ public class SideMenuControllerTest extends BaseTest {
     }
 
     private void openRightMenu() {
-        isRightShown = true;
         Options options = new Options();
         options.sideMenuRootOptions.right.visible = new Bool(true);
         options.sideMenuRootOptions.right.animate = new Bool(false);
@@ -315,7 +299,6 @@ public class SideMenuControllerTest extends BaseTest {
     }
 
     private void closeLeft() {
-        isLeftShown = false;
         Options options = new Options();
         options.sideMenuRootOptions.left.visible = new Bool(false);
         options.sideMenuRootOptions.left.animate = new Bool(false);
@@ -323,7 +306,6 @@ public class SideMenuControllerTest extends BaseTest {
     }
 
     private void closeRightMenu() {
-        isRightShown = false;
         Options options = new Options();
         options.sideMenuRootOptions.right.visible = new Bool(false);
         options.sideMenuRootOptions.right.animate = new Bool(false);

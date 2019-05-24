@@ -34,6 +34,8 @@ public class SideMenuController extends ParentController<DrawerLayout> implement
 	private ViewController left;
 	private ViewController right;
     private SideMenuPresenter presenter;
+    private float prevLeftSlideOffset = 0;
+    private float prevRightSlideOffset = 0;
 
     public SideMenuController(Activity activity, ChildControllersRegistry childRegistry, String id, Options initialOptions, SideMenuPresenter sideMenuOptionsPresenter, Presenter presenter) {
 		super(activity, childRegistry, id, presenter, initialOptions);
@@ -121,7 +123,14 @@ public class SideMenuController extends ParentController<DrawerLayout> implement
 
     @Override
     public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
+        int gravity = getSideMenuGravity(drawerView);
+        if (gravity == Gravity.LEFT) {
+            dispatchSideMenuVisibilityEvents(left, prevLeftSlideOffset, slideOffset);
+            prevLeftSlideOffset = slideOffset;
+        } else if (gravity == Gravity.RIGHT) {
+            dispatchSideMenuVisibilityEvents(right, prevRightSlideOffset, slideOffset);
+            prevRightSlideOffset = slideOffset;
+        }
     }
 
     @Override
@@ -188,6 +197,10 @@ public class SideMenuController extends ParentController<DrawerLayout> implement
         return (left != null && drawerView.equals(left.getView()));
     }
 
+    private int getSideMenuGravity(View drawerView) {
+        return ((LayoutParams) drawerView.getLayoutParams()).gravity;
+    }
+
     private Options getOptionsWithVisibility(boolean isLeft, boolean visible ) {
         Options options = new Options();
         if (isLeft) {
@@ -196,5 +209,13 @@ public class SideMenuController extends ParentController<DrawerLayout> implement
             options.sideMenuRootOptions.right.visible = new Bool(visible);
         }
         return options;
+    }
+
+    private void dispatchSideMenuVisibilityEvents(ViewController drawer, float prevOffset, float offset) {
+        if (prevOffset == 0 && offset> 0) {
+            drawer.onViewAppeared();
+        } else if (prevOffset > 0 && offset == 0) {
+            drawer.onViewDisappear();
+        }
     }
 }
