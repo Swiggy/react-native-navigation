@@ -28,8 +28,8 @@
 }
 
 - (void)mergeOptions:(RNNNavigationOptions *)options {
-	[_presenter mergeOptions:options currentOptions:self.options defaultOptions:self.defaultOptions];
-	[((UIViewController<RNNLayoutProtocol> *)self.parentViewController) mergeOptions:options];
+	[_presenter mergeOptions:options currentOptions:self.options];
+	[self.parentViewController mergeOptions:options];
 }
 
 - (void)overrideOptions:(RNNNavigationOptions *)options {
@@ -42,7 +42,7 @@
 	[_presenter applyOptions:self.resolveOptions];
 	[_presenter renderComponents:self.resolveOptions perform:nil];
 	
-	[((UIViewController *)self.parentViewController) onChildWillAppear];
+	[self.parentViewController onChildWillAppear];
 }
 
 -(void)viewDidAppear:(BOOL)animated {

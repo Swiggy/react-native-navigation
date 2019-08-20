@@ -20,13 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.reactnativenavigation.BuildConfig;
 import com.reactnativenavigation.R;
 import com.reactnativenavigation.anim.TopBarAnimator;
 import com.reactnativenavigation.anim.TopBarCollapseBehavior;
 import com.reactnativenavigation.interfaces.ScrollEventListener;
 import com.reactnativenavigation.parse.Alignment;
 import com.reactnativenavigation.parse.AnimationOptions;
+import com.reactnativenavigation.parse.LayoutDirection;
 import com.reactnativenavigation.parse.params.Colour;
 import com.reactnativenavigation.parse.params.Number;
 import com.reactnativenavigation.utils.CompatUtils;
@@ -331,5 +331,9 @@ public class TopBar extends AppBarLayout implements ScrollEventListener.ScrollAw
 
     public void setOverflowButtonColor(int color) {
         titleBar.setOverflowButtonColor(color);
+    }
+
+    public void setLayoutDirection(LayoutDirection direction) {
+        titleBar.setLayoutDirection(direction.get());
     }
 }

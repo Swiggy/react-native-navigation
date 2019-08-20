@@ -2,7 +2,6 @@
 #import <OCMock/OCMock.h>
 #import "RNNViewControllerPresenter.h"
 #import "UIViewController+RNNOptions.h"
-#import "RNNReactView.h"
 #import "RNNRootViewController.h"
 
 @interface RNNViewControllerPresenterTest : XCTestCase
@@ -19,7 +18,7 @@
 - (void)setUp {
     [super setUp];
 	self.componentRegistry = [OCMockObject partialMockForObject:[RNNReactComponentRegistry new]];
-	self.uut = [[RNNViewControllerPresenter alloc] initWithComponentRegistry:self.componentRegistry];
+	self.uut = [[RNNViewControllerPresenter alloc] initWithComponentRegistry:self.componentRegistry:[[RNNNavigationOptions alloc] initEmptyOptions]];
 	self.bindedViewController = [OCMockObject partialMockForObject:[RNNRootViewController new]];
 	[self.uut bindViewController:self.bindedViewController];
 	self.options = [[RNNNavigationOptions alloc] initEmptyOptions];
@@ -141,7 +140,7 @@
 	
 	self.options.topBar.title.component = [[RNNComponentOptions alloc] initWithDict:@{@"name": @"componentName"}];
 	
-	[[(id)self.componentRegistry expect] clearComponentsForParentId:self.uut.bindedComponentId];
+	[[(id)self.componentRegistry expect] clearComponentsForParentId:self.uut.boundComponentId];
 	self.uut = nil;
 	[(id)self.componentRegistry verify];
 }
@@ -153,7 +152,7 @@
 	bindViewController.layoutInfo = layoutInfo;
 	
 	[self.uut bindViewController:bindViewController];
-	XCTAssertEqual(self.uut.bindedComponentId, @"componentId");
+	XCTAssertEqual(self.uut.boundComponentId, @"componentId");
 }
 
 - (void)testRenderComponentsCreateReactViewWithBindedComponentId {
@@ -165,12 +164,12 @@
 	
 	self.options.topBar.title.component = [[RNNComponentOptions alloc] initWithDict:@{@"name": @"titleComponent"}];
 	
-	[[(id)self.componentRegistry expect] createComponentIfNotExists:self.options.topBar.title.component parentComponentId:self.uut.bindedComponentId reactViewReadyBlock:[OCMArg any]];
+	[[(id)self.componentRegistry expect] createComponentIfNotExists:self.options.topBar.title.component parentComponentId:self.uut.boundComponentId reactViewReadyBlock:[OCMArg any]];
 	[self.uut renderComponents:self.options perform:nil];
 	[(id)self.componentRegistry verify];
 	
 	
-	XCTAssertEqual(self.uut.bindedComponentId, @"componentId");
+	XCTAssertEqual(self.uut.boundComponentId, @"componentId");
 }
 
 - (void)testApplyOptionsOnWillMoveToParent_shouldSetBackButtonOnBindedViewController_withTitle {

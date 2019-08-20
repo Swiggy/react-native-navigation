@@ -3,10 +3,15 @@
 
 @implementation RNNSideMenuPresenter
 
+-(instancetype)initWithDefaultOptions:(RNNNavigationOptions *)defaultOptions {
+	self = [super initWithDefaultOptions:defaultOptions];
+	return self;
+}
+
 - (void)applyOptions:(RNNNavigationOptions *)options {
 	[super applyOptions:options];
 		
-	RNNSideMenuController* sideMenuController = self.bindedViewController;
+	RNNSideMenuController* sideMenuController = self.boundViewController;
 	
 	[sideMenuController side:MMDrawerSideLeft enabled:[options.sideMenu.left.enabled getWithDefaultValue:YES]];
 	[sideMenuController side:MMDrawerSideRight enabled:[options.sideMenu.right.enabled getWithDefaultValue:YES]];
@@ -41,7 +46,7 @@
 - (void)applyOptionsOnInit:(RNNNavigationOptions *)initialOptions {
 	[super applyOptionsOnInit:initialOptions];
 	
-	RNNSideMenuController* sideMenuController = self.bindedViewController;
+	RNNSideMenuController* sideMenuController = self.boundViewController;
 	if (initialOptions.sideMenu.left.width.hasValue) {
 		[sideMenuController side:MMDrawerSideLeft width:initialOptions.sideMenu.left.width.get];
 	}
@@ -53,10 +58,10 @@
 		[sideMenuController setOpenDrawerGestureModeMask:[[initialOptions.sideMenu.openGestureMode getWithDefaultValue:@(MMOpenDrawerGestureModeAll)] integerValue]];
 }
 
-- (void)mergeOptions:(RNNNavigationOptions *)newOptions currentOptions:(RNNNavigationOptions *)currentOptions defaultOptions:(RNNNavigationOptions *)defaultOptions {
-	[super mergeOptions:newOptions currentOptions:currentOptions defaultOptions:defaultOptions];
+- (void)mergeOptions:(RNNNavigationOptions *)newOptions currentOptions:(RNNNavigationOptions *)currentOptions {
+	[super mergeOptions:newOptions currentOptions:currentOptions];
 	
-	RNNSideMenuController* sideMenuController = self.bindedViewController;
+	RNNSideMenuController* sideMenuController = self.boundViewController;
 	
 	if (newOptions.sideMenu.left.enabled.hasValue) {
 		[sideMenuController side:MMDrawerSideLeft enabled:newOptions.sideMenu.left.enabled.get];

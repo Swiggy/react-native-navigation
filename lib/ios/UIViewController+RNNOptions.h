@@ -1,5 +1,7 @@
 #import <UIKit/UIKit.h>
 
+@class RNNBottomTabOptions;
+
 @interface UIViewController (RNNOptions)
 
 - (void)rnn_setBackgroundImage:(UIImage *)backgroundImage;
